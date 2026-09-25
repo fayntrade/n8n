@@ -1,0 +1,611 @@
+{
+  "name": "Салон: автопостинг Reels «Колесо фортуны»",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 11
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000016",
+      "name": "Каждый день в 11:00",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000001",
+              "name": "salon_name",
+              "value": "Салон красоты «Название»",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000002",
+              "name": "city",
+              "value": "Москва",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000003",
+              "name": "keyword",
+              "value": "КОЛЕСО",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000004",
+              "name": "prize_a",
+              "value": "скидка 50%",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000005",
+              "name": "prize_b",
+              "value": "бесплатный уход за кожей",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000006",
+              "name": "creatomate_template_id",
+              "value": "ВСТАВЬТЕ_ID_ШАБЛОНА_CREATOMATE",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000007",
+              "name": "ig_user_id",
+              "value": "ВСТАВЬТЕ_INSTAGRAM_USER_ID",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000008",
+              "name": "graph_version",
+              "value": "v21.0",
+              "type": "string"
+            },
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000009",
+              "name": "claude_model",
+              "value": "claude-sonnet-5",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000017",
+      "name": "Настройки",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  model: $json.claude_model,\n  max_tokens: 800,\n  messages: [{\n    role: 'user',\n    content: 'Ты SMM-маркетолог салона красоты \"' + $json.salon_name + '\" (' + $json.city + '). ' +\n      'Напиши сценарий вертикального Reels на 15 секунд по формуле: игра в директе + бот + гарантированный приз. ' +\n      'Кодовое слово: ' + $json.keyword + '. Призы: ' + $json.prize_a + ' или ' + $json.prize_b + '. ' +\n      'Каждый день придумывай новый хук, не повторяйся. Сегодня ' + $now.toFormat('dd.MM.yyyy') + '. ' +\n      'Ответь ТОЛЬКО JSON без пояснений: {\"hook\": \"хук до 6 слов\", \"subtitle\": \"механика до 12 слов\", ' +\n      '\"cta\": \"призыв с кодовым словом до 8 слов\", \"caption\": \"подпись к посту до 300 символов с эмодзи и 5 хэштегами\"}'\n  }]\n}) }}",
+        "options": {},
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000018",
+      "name": "Сценарий от Claude",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Claude returns text; extract the JSON object from it\nconst text = ($json.content ?? []).map((c) => c.text ?? '').join('');\nconst start = text.indexOf('{');\nconst end = text.lastIndexOf('}');\nif (start === -1 || end === -1) throw new Error('Claude did not return JSON: ' + text);\nconst script = JSON.parse(text.slice(start, end + 1));\nfor (const key of ['hook', 'subtitle', 'cta', 'caption']) {\n  if (!script[key]) throw new Error('Missing field in script: ' + key);\n}\nreturn [{ json: script }];"
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000019",
+      "name": "Разобрать сценарий",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.creatomate.com/v1/renders",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  template_id: $('Настройки').first().json.creatomate_template_id,\n  modifications: {\n    'Hook.text': $json.hook,\n    'Subtitle.text': $json.subtitle,\n    'CTA.text': $json.cta\n  }\n}) }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000020",
+      "name": "Собрать ролик (Creatomate)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 20,
+        "unit": "seconds"
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000021",
+      "name": "Ждать рендер",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        0
+      ],
+      "webhookId": "a1b2c3d4-0000-4000-8000-000000000010"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.creatomate.com/v1/renders/{{ $('Собрать ролик (Creatomate)').first().json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000022",
+      "name": "Статус рендера",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000011",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "succeeded",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000023",
+      "name": "Ролик готов?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000012",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "failed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000024",
+      "name": "Ошибка рендера?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{ 'Creatomate: ' + ($json.error_message || 'render failed') }}"
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000025",
+      "name": "Стоп: рендер не удался",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1980,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/{{ $('Настройки').first().json.graph_version }}/{{ $('Настройки').first().json.ig_user_id }}/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  media_type: 'REELS',\n  video_url: $json.url,\n  caption: $('Разобрать сценарий').first().json.caption,\n  share_to_feed: true\n}) }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000026",
+      "name": "Создать контейнер Reels",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1760,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 30,
+        "unit": "seconds"
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000027",
+      "name": "Ждать обработку Instagram",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1980,
+        -160
+      ],
+      "webhookId": "a1b2c3d4-0000-4000-8000-000000000013"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://graph.instagram.com/{{ $('Настройки').first().json.graph_version }}/{{ $('Создать контейнер Reels').first().json.id }}?fields=status_code",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000028",
+      "name": "Статус контейнера",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2200,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000014",
+              "leftValue": "={{ $json.status_code }}",
+              "rightValue": "FINISHED",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000029",
+      "name": "Видео обработано?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2420,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "a1b2c3d4-0000-4000-8000-000000000015",
+              "leftValue": "={{ $json.status_code }}",
+              "rightValue": "ERROR",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000030",
+      "name": "Ошибка Instagram?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2640,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "Instagram: video processing failed (status_code = ERROR)"
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000031",
+      "name": "Стоп: Instagram отклонил видео",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        2860,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.instagram.com/{{ $('Настройки').first().json.graph_version }}/{{ $('Настройки').first().json.ig_user_id }}/media_publish",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ creation_id: $('Создать контейнер Reels').first().json.id }) }}",
+        "options": {}
+      },
+      "id": "a1b2c3d4-0000-4000-8000-000000000032",
+      "name": "Опубликовать Reels",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        -320
+      ]
+    }
+  ],
+  "connections": {
+    "Каждый день в 11:00": {
+      "main": [
+        [
+          {
+            "node": "Настройки",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Настройки": {
+      "main": [
+        [
+          {
+            "node": "Сценарий от Claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Сценарий от Claude": {
+      "main": [
+        [
+          {
+            "node": "Разобрать сценарий",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Разобрать сценарий": {
+      "main": [
+        [
+          {
+            "node": "Собрать ролик (Creatomate)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Собрать ролик (Creatomate)": {
+      "main": [
+        [
+          {
+            "node": "Ждать рендер",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ждать рендер": {
+      "main": [
+        [
+          {
+            "node": "Статус рендера",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Статус рендера": {
+      "main": [
+        [
+          {
+            "node": "Ролик готов?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ролик готов?": {
+      "main": [
+        [
+          {
+            "node": "Создать контейнер Reels",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ошибка рендера?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ошибка рендера?": {
+      "main": [
+        [
+          {
+            "node": "Стоп: рендер не удался",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ждать рендер",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Создать контейнер Reels": {
+      "main": [
+        [
+          {
+            "node": "Ждать обработку Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ждать обработку Instagram": {
+      "main": [
+        [
+          {
+            "node": "Статус контейнера",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Статус контейнера": {
+      "main": [
+        [
+          {
+            "node": "Видео обработано?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Видео обработано?": {
+      "main": [
+        [
+          {
+            "node": "Опубликовать Reels",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ошибка Instagram?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ошибка Instagram?": {
+      "main": [
+        [
+          {
+            "node": "Стоп: Instagram отклонил видео",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Ждать обработку Instagram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
