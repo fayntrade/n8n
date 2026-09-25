@@ -83,7 +83,7 @@
         "options": {}
       },
       "id": "a1b2c3d4-0000-4000-8000-000000000017",
-      "name": "Настройки",
+      "name": "⚙️ НАСТРОЙКИ — заполните",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
@@ -141,7 +141,7 @@
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({\n  template_id: $('Настройки').first().json.creatomate_template_id,\n  modifications: {\n    'Hook.text': $json.hook,\n    'Subtitle.text': $json.subtitle,\n    'CTA.text': $json.cta\n  }\n}) }}",
+        "jsonBody": "={{ JSON.stringify({\n  template_id: $('⚙️ НАСТРОЙКИ — заполните').first().json.creatomate_template_id,\n  modifications: {\n    'Hook.text': $json.hook,\n    'Subtitle.text': $json.subtitle,\n    'CTA.text': $json.cta\n  }\n}) }}",
         "options": {}
       },
       "id": "a1b2c3d4-0000-4000-8000-000000000020",
@@ -267,7 +267,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.instagram.com/{{ $('Настройки').first().json.graph_version }}/{{ $('Настройки').first().json.ig_user_id }}/media",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.ig_user_id }}/media",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -302,7 +302,7 @@
     {
       "parameters": {
         "method": "GET",
-        "url": "=https://graph.instagram.com/{{ $('Настройки').first().json.graph_version }}/{{ $('Создать контейнер Reels').first().json.id }}?fields=status_code",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/{{ $('Создать контейнер Reels').first().json.id }}?fields=status_code",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "options": {}
@@ -398,7 +398,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.instagram.com/{{ $('Настройки').first().json.graph_version }}/{{ $('Настройки').first().json.ig_user_id }}/media_publish",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.ig_user_id }}/media_publish",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -421,14 +421,14 @@
       "main": [
         [
           {
-            "node": "Настройки",
+            "node": "⚙️ НАСТРОЙКИ — заполните",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Настройки": {
+    "⚙️ НАСТРОЙКИ — заполните": {
       "main": [
         [
           {

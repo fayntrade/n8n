@@ -30,7 +30,7 @@
             {
               "id": "a1b2c3d4-0000-4000-8000-000000000034",
               "leftValue": "={{ $json.query[\"hub.verify_token\"] }}",
-              "rightValue": "ПРИДУМАЙТЕ_СВОЙ_VERIFY_TOKEN",
+              "rightValue": "salon2026",
               "operator": {
                 "type": "string",
                 "operation": "equals"
@@ -42,7 +42,7 @@
         "options": {}
       },
       "id": "a1b2c3d4-0000-4000-8000-000000000046",
-      "name": "Токен верный?",
+      "name": "⚙️ Проверка Instagram — впишите свой пароль",
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
@@ -138,7 +138,7 @@
         "includeOtherFields": true
       },
       "id": "a1b2c3d4-0000-4000-8000-000000000050",
-      "name": "Настройки бота",
+      "name": "⚙️ НАСТРОЙКИ — заполните",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
@@ -148,7 +148,7 @@
     },
     {
       "parameters": {
-        "jsCode": "// Instagram sends a batch: entry[] -> messaging[]\nconst keyword = $('Настройки бота').first().json.keyword.toUpperCase();\nconst results = [];\nfor (const item of $input.all()) {\n  const body = item.json.body ?? {};\n  for (const entry of body.entry ?? []) {\n    for (const event of entry.messaging ?? []) {\n      const message = event.message;\n      // Skip our own outgoing messages and non-text events\n      if (!message || message.is_echo) continue;\n      const text = (message.text ?? '').trim();\n      const payload = message.quick_reply?.payload ?? '';\n      let intent = 'other';\n      if (payload.startsWith('BOOK_')) intent = 'book';\n      else if (text.toUpperCase().includes(keyword)) intent = 'spin';\n      results.push({ json: { sender_id: event.sender.id, text, payload, intent } });\n    }\n  }\n}\nreturn results;"
+        "jsCode": "// Instagram sends a batch: entry[] -> messaging[]\nconst keyword = $('⚙️ НАСТРОЙКИ — заполните').first().json.keyword.toUpperCase();\nconst results = [];\nfor (const item of $input.all()) {\n  const body = item.json.body ?? {};\n  for (const entry of body.entry ?? []) {\n    for (const event of entry.messaging ?? []) {\n      const message = event.message;\n      // Skip our own outgoing messages and non-text events\n      if (!message || message.is_echo) continue;\n      const text = (message.text ?? '').trim();\n      const payload = message.quick_reply?.payload ?? '';\n      let intent = 'other';\n      if (payload.startsWith('BOOK_')) intent = 'book';\n      else if (text.toUpperCase().includes(keyword)) intent = 'spin';\n      results.push({ json: { sender_id: event.sender.id, text, payload, intent } });\n    }\n  }\n}\nreturn results;"
       },
       "id": "a1b2c3d4-0000-4000-8000-000000000051",
       "name": "Разобрать сообщение",
@@ -274,12 +274,12 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.instagram.com/{{ $('Настройки бота').first().json.graph_version }}/me/messages",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/me/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ recipient: { id: $('Разобрать сообщение').item.json.sender_id }, message: { text: 'Ты уже крутила колесо 😉 Твой приз: ' + $json.prize + '. Промокод: ' + $json.code + '. Записаться: ' + $('Настройки бота').first().json.booking_url } }) }}",
+        "jsonBody": "={{ JSON.stringify({ recipient: { id: $('Разобрать сообщение').item.json.sender_id }, message: { text: 'Ты уже крутила колесо 😉 Твой приз: ' + $json.prize + '. Промокод: ' + $json.code + '. Записаться: ' + $('⚙️ НАСТРОЙКИ — заполните').first().json.booking_url } }) }}",
         "options": {}
       },
       "id": "a1b2c3d4-0000-4000-8000-000000000055",
@@ -294,7 +294,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.instagram.com/{{ $('Настройки бота').first().json.graph_version }}/me/messages",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/me/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -314,12 +314,12 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.instagram.com/{{ $('Настройки бота').first().json.graph_version }}/me/messages",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/me/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ recipient: { id: $('Разобрать сообщение').item.json.sender_id }, message: { attachment: { type: 'image', payload: { url: $('Настройки бота').first().json.wheel_gif_url } } } }) }}",
+        "jsonBody": "={{ JSON.stringify({ recipient: { id: $('Разобрать сообщение').item.json.sender_id }, message: { attachment: { type: 'image', payload: { url: $('⚙️ НАСТРОЙКИ — заполните').first().json.wheel_gif_url } } } }) }}",
         "options": {}
       },
       "id": "a1b2c3d4-0000-4000-8000-000000000057",
@@ -349,7 +349,7 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.instagram.com/{{ $('Настройки бота').first().json.graph_version }}/me/messages",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/me/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
@@ -368,62 +368,10 @@
     },
     {
       "parameters": {
-        "rule": {
-          "interval": [
-            {
-              "field": "hours"
-            }
-          ]
-        }
-      },
-      "id": "a1b2c3d4-0000-4000-8000-000000000060",
-      "name": "Каждый час",
-      "type": "n8n-nodes-base.scheduleTrigger",
-      "typeVersion": 1.2,
-      "position": [
-        0,
-        400
-      ]
-    },
-    {
-      "parameters": {
-        "jsCode": "// Remind once, 20+ hours after the spin, if the client did not book\nconst HOUR = 60 * 60 * 1000;\nconst store = $getWorkflowStaticData('global');\nconst results = [];\nfor (const [senderId, spin] of Object.entries(store.spins ?? {})) {\n  const age = Date.now() - new Date(spin.at).getTime();\n  if (spin.booked || spin.reminded || age < 20 * HOUR || age > 24 * HOUR) continue;\n  spin.reminded = true;\n  results.push({ json: { sender_id: senderId, prize: spin.prize, code: spin.code } });\n}\nreturn results;"
-      },
-      "id": "a1b2c3d4-0000-4000-8000-000000000061",
-      "name": "Найти сгорающие подарки",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        220,
-        400
-      ]
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "=https://graph.instagram.com/{{ 'v21.0' }}/me/messages",
-        "authentication": "genericCredentialType",
-        "genericAuthType": "httpHeaderAuth",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ recipient: { id: $json.sender_id }, message: { text: '⏳ Твой подарок «' + $json.prize + '» сгорит через 4 часа! Промокод ' + $json.code + '. Запись: ' + 'https://ВАША-ОНЛАЙН-ЗАПИСЬ' } }) }}",
-        "options": {}
-      },
-      "id": "a1b2c3d4-0000-4000-8000-000000000062",
-      "name": "Напоминание: подарок сгорает",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        440,
-        400
-      ]
-    },
-    {
-      "parameters": {
         "mode": "runOnceForEachItem",
         "jsCode": "const store = $getWorkflowStaticData('global');\nstore.spins ??= {};\nconst spin = store.spins[$json.sender_id];\nif (spin) spin.booked = true;\nconst days = { BOOK_TODAY: 'сегодня', BOOK_TOMORROW: 'завтра', BOOK_WEEKEND: 'на выходных' };\nreturn { json: { ...$json, day: days[$json.payload] ?? $json.text, prize: spin?.prize ?? '', code: spin?.code ?? '' } };"
       },
-      "id": "a1b2c3d4-0000-4000-8000-000000000063",
+      "id": "a1b2c3d4-0000-4000-8000-000000000060",
       "name": "Отметить запись",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -435,15 +383,15 @@
     {
       "parameters": {
         "method": "POST",
-        "url": "=https://graph.instagram.com/{{ $('Настройки бота').first().json.graph_version }}/me/messages",
+        "url": "=https://graph.instagram.com/{{ $('⚙️ НАСТРОЙКИ — заполните').first().json.graph_version }}/me/messages",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ recipient: { id: $('Разобрать сообщение').item.json.sender_id }, message: { text: 'Отлично, ждём тебя ' + $json.day + '! 💅 Выбери точное время тут: ' + $('Настройки бота').first().json.booking_url + ' или позвони ' + $('Настройки бота').first().json.salon_phone + '. Не забудь промокод ' + $json.code } }) }}",
+        "jsonBody": "={{ JSON.stringify({ recipient: { id: $('Разобрать сообщение').item.json.sender_id }, message: { text: 'Отлично, ждём тебя ' + $json.day + '! 💅 Выбери точное время тут: ' + $('⚙️ НАСТРОЙКИ — заполните').first().json.booking_url + ' или позвони ' + $('⚙️ НАСТРОЙКИ — заполните').first().json.salon_phone + '. Не забудь промокод ' + $json.code } }) }}",
         "options": {}
       },
-      "id": "a1b2c3d4-0000-4000-8000-000000000064",
+      "id": "a1b2c3d4-0000-4000-8000-000000000061",
       "name": "Подтвердить запись",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
@@ -458,14 +406,14 @@
       "main": [
         [
           {
-            "node": "Токен верный?",
+            "node": "⚙️ Проверка Instagram — впишите свой пароль",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Токен верный?": {
+    "⚙️ Проверка Instagram — впишите свой пароль": {
       "main": [
         [
           {
@@ -487,14 +435,14 @@
       "main": [
         [
           {
-            "node": "Настройки бота",
+            "node": "⚙️ НАСТРОЙКИ — заполните",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Настройки бота": {
+    "⚙️ НАСТРОЙКИ — заполните": {
       "main": [
         [
           {
@@ -590,28 +538,6 @@
         [
           {
             "node": "Объявить приз",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Каждый час": {
-      "main": [
-        [
-          {
-            "node": "Найти сгорающие подарки",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Найти сгорающие подарки": {
-      "main": [
-        [
-          {
-            "node": "Напоминание: подарок сгорает",
             "type": "main",
             "index": 0
           }
